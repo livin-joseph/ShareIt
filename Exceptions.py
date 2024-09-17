@@ -1,0 +1,2 @@
+class EmptyBufferException(Exception):
+    pass

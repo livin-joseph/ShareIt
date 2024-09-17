@@ -7,9 +7,14 @@ def send():
     if request.method == 'POST':
         file = request.files['file']
         from Client import upload
-        upload(file)
+        try:
+            upload(file)
+        except Exception as e:
+            message = {'title': 'Upload failed', 'msg': 'Server is offline'}
+            return render_template('done_upload.html', **message)
 
-        return render_template('done_upload.html')
+        message = {'title': 'Upload successful', 'msg': 'You will be redirected to homepage in 5 seconds...'}
+        return render_template('done_upload.html', **message)
 
     # Handle GET requests by rendering the upload page
     return render_template('upload.html')
@@ -18,10 +23,21 @@ def send():
 def receive():
     if request.method == 'POST':
         from Client import download
-        download()
-
-        return render_template('done_download.html')
+        from Exceptions import EmptyBufferException
+        try:
+            download()
+        except EmptyBufferException as e:
+            print(e)
+            message = {'title': 'Download failed', 'msg': 'There is no file uploaded to the server'}
+            return render_template('done_download.html', **message)
+        except Exception as e:
+            print(type(e))
+            message = {'title': 'Download failed', 'msg': 'Server is offline'}
+            return render_template('done_download.html', **message)
     
+        message = {'title': 'Download successful', 'msg': 'You will be redirected to homepage in 5 seconds...'}
+        return render_template('done_download.html', **message)
+
     # Handle GET requests by rendering the download page
     return render_template('download.html')
 

@@ -37,6 +37,12 @@ def download():
     s.send('Download'.encode())
     
     size = int(s.recv(1024).decode())
+
+    if size == 0:
+        s.close()
+        from Exceptions import EmptyBufferException
+        raise EmptyBufferException("Server buffer is empty")
+    
     s.send('Got size of the file'.encode())
 
     received = s.recv(size)

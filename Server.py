@@ -7,7 +7,7 @@ def server():
     s.bind(('127.0.0.1', port))
     print("Socket binded to", port)
 
-    s.listen(5)
+    s.listen(10)
     print("Socket is listening")
 
     while True:
@@ -54,10 +54,14 @@ def server():
                 c.close()
                 print('File sent to client')
             else:
+                c.send('0'.encode())
+
+                c.close()
                 print('Buffer is empty')
 
         else:
             c.close()
             print('Server is stopped')
             break
+
 server()
