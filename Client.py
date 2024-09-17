@@ -60,6 +60,10 @@ def download():
 
     s.close()
 
+def start():
+    from Server import server
+    server()
+
 def stop():
     import socket
     s = socket.socket()
