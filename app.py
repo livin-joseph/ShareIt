@@ -4,16 +4,14 @@ app = Flask(__name__)
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
-    print(request.files)
     if request.method == 'POST':
-        from Client import upload
         file = request.files['file']
-        print('FILENAME: ', file)
+        from Client import upload
         upload(file)
 
         return 'File is uploaded successfully!'
 
-    # Handle GET requests by rendering the upload form
+    # Handle GET requests by rendering the upload page
     return render_template('upload.html')
 
 @app.route('/receive', methods=['GET', 'POST'])
@@ -24,7 +22,7 @@ def receive():
 
         return 'File is downloaded successfully!'
     
-    # Handle GET requests by rendering the upload form
+    # Handle GET requests by rendering the download page
     return render_template('download.html')
 
 @app.route('/', methods=['GET', 'POST'])
@@ -34,7 +32,8 @@ def index():
             return redirect(url_for('send'))
         elif 'receive_button' in request.form:
             return redirect(url_for('receive'))
-        print('heyy')
+
+    # Handle GET requests by rendering the homepage
     return render_template('home.html')
 
 if __name__ == '__main__':
