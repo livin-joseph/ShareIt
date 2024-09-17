@@ -10,7 +10,7 @@ def send():
         try:
             upload(file)
         except Exception as e:
-            message = {'title': 'Upload failed', 'msg': 'Server is offline'}
+            message = {'title': 'Upload failed', 'msg': 'Server is offline<br>You will be redirected to homepage in 5 seconds...'}
             return render_template('redirect.html', **message)
 
         message = {'title': 'Upload successful', 'msg': 'You will be redirected to homepage in 5 seconds...'}

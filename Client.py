@@ -1,3 +1,5 @@
+server_active = False
+
 def upload(file):
     import socket
     s = socket.socket()
@@ -61,20 +63,31 @@ def download():
     s.close()
 
 def start():
-    from Server import server
-    server()
+    global server_active
+    if server_active == False:
+        from Server import server
+        server()
+        server_active = True
+    else:
+        raise Exception('Server is online already')
 
 def stop():
-    import socket
-    s = socket.socket()
-    port = 12345
+    global server_active
+    if server_active == True:
+        import socket
+        s = socket.socket()
+        port = 12345
 
-    s.connect(('127.0.0.1', port))
+        s.connect(('127.0.0.1', port))
 
-    print('Message from server:', s.recv(1024).decode())
-    s.send('You\'re welcome'.encode())
+        print('Message from server:', s.recv(1024).decode())
+        s.send('You\'re welcome'.encode())
 
-    print('Message from server:', s.recv(1024).decode())
-    s.send('Stop'.encode())
+        print('Message from server:', s.recv(1024).decode())
+        s.send('Stop'.encode())
 
-    s.close()
+        s.close()
+
+        server_active = False
+    else:
+        raise Exception('Server is offline already')
