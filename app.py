@@ -7,9 +7,9 @@ def send():
     print(request.files)
     if request.method == 'POST':
         from Client import upload
-        filename = request.form.get('file')
-        print(filename)
-        upload(filename)
+        file = request.files['file']
+        print('FILENAME: ', file)
+        upload(file)
 
         return 'File is uploaded successfully!'
 
