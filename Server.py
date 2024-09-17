@@ -27,6 +27,11 @@ def server():
             size = int(c.recv(1024).decode())
             print(f'Size of the file: {size} bytes')
 
+            c.send('Send name of the file'.encode())
+
+            filename = c.recv(1024).decode()
+            print(f'Name of the file: {filename}')
+
             c.send('Send the file'.encode())
 
             received = c.recv(size)
@@ -37,7 +42,7 @@ def server():
                 file.write(received)
             '''
 
-            buffer.append((size, received))
+            buffer.append((size, filename, received))
 
             c.close()
             print('File received from client')
@@ -49,7 +54,11 @@ def server():
 
                 print('Message from client:', c.recv(1024).decode())
 
-                c.send(t[1])
+                c.send(t[1].encode())
+
+                print('Message from client:', c.recv(1024).decode())
+
+                c.send(t[2])
 
                 c.close()
                 print('File sent to client')
