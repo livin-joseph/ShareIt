@@ -30,10 +30,13 @@ def server():
             c.send('Send the file'.encode())
 
             received = c.recv(size)
+
             '''
+            # To save the received bytestream as a file
             with open('Flask/goat.jpg', 'wb') as file:
                 file.write(received)
             '''
+
             buffer.append((size, received))
 
             c.close()
