@@ -9,7 +9,7 @@ def send():
         from Client import upload
         upload(file)
 
-        return 'File is uploaded successfully!'
+        return render_template('done_upload.html')
 
     # Handle GET requests by rendering the upload page
     return render_template('upload.html')
@@ -20,7 +20,7 @@ def receive():
         from Client import download
         download()
 
-        return 'File is downloaded successfully!'
+        return render_template('done_download.html')
     
     # Handle GET requests by rendering the download page
     return render_template('download.html')

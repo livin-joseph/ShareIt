@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}" />
+    <title>Redirect Page</title>
+    <script type="text/javascript">
+        // Redirect to another page after 5 seconds
+        setTimeout(function(){
+            window.location.href = "/";
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
+</head>
+<body class="is-preload">
+    <div id="page-wrapper">
+        <section id="main" class="container">
+            <h2>Successfully downloaded</h2>
+            <p>You will be redirected to homepage in 5 seconds...</p>
+        </section>
+    </div>
+</body>
+</html>
