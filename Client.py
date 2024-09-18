@@ -1,6 +1,6 @@
 server_active = False
 
-def upload(file):
+def upload(file, passwd):
     import socket
     s = socket.socket()
     port = 12345
@@ -12,6 +12,9 @@ def upload(file):
 
     print('Message from server:', s.recv(1024).decode())
     s.send('Upload'.encode())
+
+    print('Message from server:', s.recv(1024).decode())
+    s.send(passwd.encode())
 
     print('Message from server:', s.recv(1024).decode())
     file.seek(0, 2)
@@ -28,7 +31,7 @@ def upload(file):
 
     s.close()
 
-def download():
+def download(filename, passwd):
     import socket
     s = socket.socket()
     port = 12345
@@ -41,13 +44,23 @@ def download():
     print('Message from server:', s.recv(1024).decode())
     s.send('Download'.encode())
     
+    print('Message from server:', s.recv(1024).decode())
+    s.send(filename.encode())
+    
+    print('Message from server:', s.recv(1024).decode())
+    s.send(passwd.encode())
+    
     size = int(s.recv(1024).decode())
 
     if size == 0:
         s.close()
-        from Exceptions import EmptyBufferException
-        raise EmptyBufferException("Server buffer is empty")
-    
+        from Exceptions import FileNotFoundException
+        raise FileNotFoundException("File is not found in the server")
+    elif size == -1:
+        s.close()
+        from Exceptions import WrongPasswordException
+        raise WrongPasswordException("Password to access the file is incorrect")
+
     s.send('Got size of the file'.encode())
 
     filename = s.recv(1024).decode()
@@ -61,33 +74,3 @@ def download():
     print('File received from server')
 
     s.close()
-
-def start():
-    global server_active
-    if server_active == False:
-        from Server import server
-        server()
-        server_active = True
-    else:
-        raise Exception('Server is online already')
-
-def stop():
-    global server_active
-    if server_active == True:
-        import socket
-        s = socket.socket()
-        port = 12345
-
-        s.connect(('127.0.0.1', port))
-
-        print('Message from server:', s.recv(1024).decode())
-        s.send('You\'re welcome'.encode())
-
-        print('Message from server:', s.recv(1024).decode())
-        s.send('Stop'.encode())
-
-        s.close()
-
-        server_active = False
-    else:
-        raise Exception('Server is offline already')

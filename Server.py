@@ -22,6 +22,9 @@ def server():
         print('Message from client:', msg)
 
         if msg == 'Upload': # Client upload - server download
+            c.send('Send password to access the file'.encode())
+            passwd = c.recv(1024).decode()
+
             c.send('Send size of the file'.encode())
 
             size = int(c.recv(1024).decode())
@@ -42,31 +45,60 @@ def server():
                 file.write(received)
             '''
 
-            buffer.append((size, filename, received))
+            buffer.append((passwd, size, filename, received))
 
             c.close()
             print('File received from client')
 
         elif msg == 'Download': # Client download - server upload
+            c.send('Send name of the file'.encode())
+            filename = c.recv(1024).decode()
+
+            c.send('Send password to access the file'.encode())
+            password = c.recv(1024).decode()
+
+            file_copy = None
+            WrongPasswordFlag = False
             if len(buffer) > 0:
-                t = buffer.pop(0)
-                c.send(str(t[0]).encode())
-
-                print('Message from client:', c.recv(1024).decode())
-
-                c.send(t[1].encode())
-
-                print('Message from client:', c.recv(1024).decode())
-
-                c.send(t[2])
-
-                c.close()
-                print('File sent to client')
+                for i in buffer:
+                    if i[2] == filename:
+                        file_copy = i
+                        print('File is found')
+                        if password != file_copy[0]:
+                            c.send('-1'.encode())
+                            c.close()
+                            print('Incorrect password')
+                            WrongPasswordFlag = True
+                        else:
+                            c.send(str(file_copy[1]).encode())
+                            print('Correct password')
+                        break
+                else:
+                    c.send('0'.encode())
+                    c.close()
+                    print('File is not found')
+                    continue
             else:
                 c.send('0'.encode())
-
                 c.close()
-                print('Buffer is empty')
+                print('File is not found')
+                continue
+
+            if WrongPasswordFlag == True:
+                continue
+
+            buffer.remove(file_copy)
+
+            print('Message from client:', c.recv(1024).decode())
+
+            c.send(file_copy[2].encode())
+
+            print('Message from client:', c.recv(1024).decode())
+
+            c.send(file_copy[3])
+
+            c.close()
+            print('File sent to client')
 
         else:
             c.close()

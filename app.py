@@ -6,9 +6,10 @@ app = Flask(__name__)
 def send():
     if request.method == 'POST':
         file = request.files['file']
+        passwd = request.form['passwd']
         from Client import upload
         try:
-            upload(file)
+            upload(file, passwd)
         except Exception as e:
             message = {'title': 'Upload failed', 'msg': 'Server is offline<br>You will be redirected to homepage in 5 seconds...'}
             return render_template('redirect.html', **message)
@@ -22,16 +23,19 @@ def send():
 @app.route('/receive', methods=['GET', 'POST'])
 def receive():
     if request.method == 'POST':
+        filename = request.form['filename']
+        passwd = request.form['passwd']
         from Client import download
-        from Exceptions import EmptyBufferException
+        from Exceptions import FileNotFoundException, WrongPasswordException
         try:
-            download()
-        except EmptyBufferException as e:
-            print(e)
-            message = {'title': 'Download failed', 'msg': 'There is no file uploaded to the server<br>You will be redirected to homepage in 5 seconds...'}
+            download(filename, passwd)
+        except FileNotFoundException as e:
+            message = {'title': 'Download failed', 'msg': 'The file is not found the server<br>You will be redirected to homepage in 5 seconds...'}
+            return render_template('redirect.html', **message)
+        except WrongPasswordException as e:
+            message = {'title': 'Download failed', 'msg': 'The password to access the file is incorrect<br>You will be redirected to homepage in 5 seconds...'}
             return render_template('redirect.html', **message)
         except Exception as e:
-            print(type(e))
             message = {'title': 'Download failed', 'msg': 'Server is offline<br>You will be redirected to homepage in 5 seconds...'}
             return render_template('redirect.html', **message)
     
@@ -49,26 +53,6 @@ def index():
 
         elif 'receive_button' in request.form:
             return redirect(url_for('receive'))
-
-        elif 'start_button' in request.form:
-            from Client import start
-            try:
-                start()
-            except Exception as e:
-                message = {'title': 'Server is online already', 'msg': 'You will be redirected to homepage in 5 seconds...'}
-                return render_template('redirect.html', **message)
-
-            message = {'title': 'Server is setup successfully', 'msg': 'You will be redirected to homepage in 5 seconds...'}
-
-        elif 'stop_button' in request.form:
-            from Client import stop
-            try:
-                stop()
-            except Exception as e:
-                message = {'title': 'Server is offline already', 'msg': 'You will be redirected to homepage in 5 seconds...'}
-                return render_template('redirect.html', **message)
-
-            message = {'title': 'Server is shutdown successfully', 'msg': 'You will be redirected to homepage in 5 seconds...'}
 
     # Handle GET requests by rendering the homepage
     return render_template('home.html')
