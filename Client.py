@@ -1,5 +1,3 @@
-server_active = False
-
 def upload(file, passwd):
     import socket
     s = socket.socket()
